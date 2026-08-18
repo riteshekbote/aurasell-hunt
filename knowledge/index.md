@@ -33,3 +33,15 @@
 
 ## FINDING INBOX (validated = move to reports/)
 - (empty)
+## Session 3 intel (2026-08-18)
+- **app1.aurasell.ai** — undocumented host discovered via APISIX redirect (Location: https://app1.aurasell.ai/auth/me). Next.js 14/15 app (data-color-mode light/dark), NextAuth-style routes:
+  - /auth/login → 307 → auth.aurasell.ai/authorize (Auth0 OIDC, PKCE S256, audience https://aurasell.us.auth0.com/api/v2/)
+  - /auth/logout → 307 → auth.aurasell.ai/oidc/logout?post_logout_redirect_uri=https://app1.aurasell.ai
+  - /auth/callback → 500 "The state parameter is missing." (NextAuth callback)
+  - /api/auth/* blocked by gateway (307 → /auth/login); /auth/register → 404
+- **UNVALIDATED callbackUrl**: /auth/login?callbackUrl=<anything> embeds it raw into the Auth0 authorize redirect (tested: //evil.com, javascript:alert(1), https://app1.aurasell.ai.evil.com, relative paths). Post-login redirect behavior NOT yet verified (no account). If post-login redirect is unvalidated → open redirect; per program policy payable only if token/credential theft is proven (PKCE+code flow is server-side, so likely phishing-only → likely rejected per policy). TODO: verify with an account.
+- Gateway: Apache APISIX 3.9.0 (server header); admin API not exposed (ports 9080/9443 closed, /apisix/admin 404/426).
+- Session cookie: `session=<16B b64|exp_ts|<235B opaque|20B digest>` — custom HMAC/encrypted format (A=16 random bytes, B=expiry, C=opaque blob (not zlib, not Fernet), D=20B SHA1-sized MAC). Set pre-auth on app.aurasell.ai. Forging requires server secret — do NOT attempt offline brute force.
+- Auth0 tenant: aurasell.us.auth0.com; client U7HwecmanN1eQcUiZonVHDLUmXygGSpm; signup via dbconnections closed ("email_verified needs to be true"). change_password: no user enumeration (uniform response).
+- Marketing: Webflow site, GTM-N2GCB6QB, LinkedIn insight, reb2b; community at aurasellai.discourse.group (Discourse-hosted, not in scope). No self-serve signup; demo via app.cal.com.
+- Program: security@aurasell.ai; page https://www.aurasell.ai/bug-bounty confirms $1000/$500/$200/$5 (Critical/High/Medium/Low).
