@@ -1,0 +1,63 @@
+programs:
+  aurasell:
+    name: Aurasell Bug Bounty
+    disclosure_policy: https://www.aurasell.ai/bug-bounty
+    contact: security@aurasell.ai
+    domains:
+      - aurasell.ai
+      - "*.aurasell.ai"
+    github_orgs: []   # no GitHub org mentioned in scope — web apps, admin consoles, APIs, production services
+    rewards: "USD: Critical $1000 / High $500 / Medium $200 / Low $5 (sole discretion)"
+
+rules:
+  # Aurasell policy: read-only, PoC mandatory, no data access, no disruption
+  passive_only: false    # active testing allowed but non-destructive; no data access/modification
+  max_requests_per_second: 1
+  no_account_creation: false   # own test accounts allowed only
+  no_data_modification: true   # "not authorized to access user data, personal data, or internal company data"
+  no_denial_of_service: true   # DoS/spam explicitly excluded
+  no_pre_disclosure: true      # disclosure to any party other than Aurasell strictly prohibited
+  stop_on_system_access: true  # if system-level access obtained: stop testing immediately and report
+  destroy_pocs_after_close: true  # all PoC artifacts must be destroyed after the report is closed
+  redact_secrets_in_commits: true  # commit sha256 of secrets, never raw values
+
+# AURASELL EXPLICIT REJECT LIST (from their policy - do NOT spend cycles, do NOT report)
+rejected_classes:
+  - "Open redirects without serious impact"   # ONLY token/credential-theft open redirects pay
+  - "Clickjacking"
+  - "Cache poisoning"
+  - "Content spoofing"
+  - "Missing SPF, DKIM, or DMARC records"
+  - "Brute-force attacks"
+  - "Non-reproducible issues"
+  - "Missing rate limiting"
+  - "Denial-of-Service (DoS / DDoS)"
+  - "CSRF with minimal or no impact"
+  - "Stack traces or path disclosures"
+  - "Vulnerabilities requiring Man-in-the-Middle (MITM)"
+  - "Theoretical subdomain takeovers without evidence"
+  - "Self-inflicted vulnerabilities by merchants"
+  - "Missing HSTS"
+  - "Issues affecting outdated or unsupported browsers or OS"
+  - "Informational security headers or version banners"
+  - "Physical attacks, social engineering, phishing, spam, DDoS-related"
+  - "Previously reported or known vulnerabilities"
+  - "Third-party hosted systems unless they directly impact Aurasell"
+
+# What PAYS on Aurasell (AI-native CRM / GTM platform): must be exploitable with a real PoC
+# - SQLi / RCE / directory traversal / LFI/RFI
+# - Privilege escalation, authN/authZ bypass, security control bypasses
+# - Sensitive data exposure (CRM data, admin consoles)
+# - XSS (stored/reflected with real user-impact PoC)
+# - CSRF with real impact
+# - SSRF
+# - Open redirects that lead to token or credential theft (Auth0 code/state theft)
+# - Administrative interfaces without authentication
+
+# Multi-model ensemble
+models:
+  - { id: opencode/big-pickle, name: bigpickle }
+  - { id: opencode/nemotron-3-ultra-free, name: nemotron3 }
+  - { id: opencode/longcat-2.0-free, name: longcat }
+  - { id: opencode/ling-3.0-flash-free, name: ling3 }
+  - { id: opencode/laguna-s-2.1-free, name: laguna }
