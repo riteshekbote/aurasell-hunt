@@ -54,5 +54,13 @@
  {
   "url": "https://challenges.cloudflare.com/turnstile/v0/api.js",
   "status": "done"
+ },
+ {
+  "url": "https://cdn.intellimize.co/snippet/117592661.js",
+  "status": "done"
+ },
+ {
+  "url": "https://cdn.prod.website-files.com/6943823083ffa5d7dc3d96ea/js/aurasell-dev.d796b85c.cbcad53a9948b820.js",
+  "status": "done"
  }
 ]
